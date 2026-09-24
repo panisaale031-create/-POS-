@@ -172,6 +172,7 @@ const app = {
         <td>${s.status === 'paid' ? '🟢 จ่ายแล้ว' : s.status === 'credit' ? '🟡 เครดิต' : '🔴 ยกเลิก'}</td>
         <td class="act-btns">
           <button class="btn btn-small" onclick="app.viewReceipt('${s.id}')">ดู</button>
+          <button class="btn btn-small btn-danger" onclick="app.deleteBill('${s.id}')">ลบ</button>
         </td>
       </tr>
     `).join('');
@@ -448,6 +449,7 @@ const app = {
     `;
     document.getElementById('receipt-modal').classList.add('open');
     document.getElementById('receipt-print-btn').onclick = () => this.printReceipt(billId);
+    document.getElementById('receipt-delete-btn').onclick = () => this.deleteBill(billId);
   },
 
   printReceipt(billId) {
@@ -620,6 +622,15 @@ const app = {
     printWindow.document.close();
     printWindow.focus();
     setTimeout(() => printWindow.print(), 500);
+  },
+
+  deleteBill(billId) {
+    if (!confirm('ต้องการลบบิลนี้ใช่ไหม? (ไม่สามารถกู้คืนได้)')) return;
+    this.sales = this.sales.filter(s => s.id !== billId);
+    this.save();
+    this.renderBills();
+    this.renderDashboard();
+    document.getElementById('receipt-modal').classList.remove('open');
   },
 
   openAddProduct() {

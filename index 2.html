@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POS ระบบขายหน้าร้าน</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="login-page">
+  <div class="login-box">
+    <div class="login-title">POS</div>
+    <div class="login-subtitle">ระบบขายหน้าร้าน</div>
+    <form onsubmit="return app.login(event)">
+      <div class="form-group">
+        <label>ชื่อผู้ใช้</label>
+        <input id="login-user" type="text" required>
+      </div>
+      <div class="form-group">
+        <label>รหัส</label>
+        <input id="login-pass" type="password" required>
+      </div>
+      <button type="submit" class="btn-login">เข้าสู่ระบบ</button>
+    </form>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-app" class="hidden" style="display:flex;flex:1;flex-direction:column">
+  <!-- NAV -->
+  <nav>
+    <div class="nav-brand" id="shop-name-nav">🏪 POS</div>
+    <div class="nav-center"></div>
+    <div class="nav-right">
+      <div class="nav-user" id="user-display"></div>
+      <button class="btn-logout" onclick="app.logout()">ออก</button>
+    </div>
+  </nav>
+
+  <!-- CONTAINER -->
+  <div class="container">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div style="padding:8px;border-bottom:1px solid var(--border);margin-bottom:8px;display:flex;flex-direction:column;gap:6px">
+        <div style="font-size:11px;color:var(--muted);font-weight:800">🏪 <span id="shop-name-sidebar">POS</span></div>
+        <div style="font-size:10px;color:var(--muted)" id="user-sidebar"></div>
+      </div>
+      <button class="sidebar-item active" onclick="app.switchTab(event, 'dashboard')">📊 Dashboard</button>
+      <button class="sidebar-item" onclick="app.switchTab(event, 'settings')">⚙️ ตั้งค่า</button>
+      <button class="sidebar-item" onclick="app.switchTab(event, 'users')">🔑 ผู้ใช้</button>
+      <button class="sidebar-item" onclick="app.switchTab(event, 'customers')">👥 ลูกค้า</button>
+      <button class="sidebar-item" onclick="app.switchTab(event, 'stock')">📥 สต็อก</button>
+      <button class="sidebar-item" onclick="app.switchTab(event, 'products')">📦 สินค้า</button>
+      <button class="sidebar-item" onclick="app.switchTab(event, 'sales')">🛒 ขาย</button>
+      <button class="sidebar-item" onclick="app.switchTab(event, 'consignment')">📤 ฝากขาย</button>
+      <button class="sidebar-item" onclick="app.switchTab(event, 'bills')">📜 บิล</button>
+      <button class="sidebar-item" onclick="app.switchTab(event, 'reports')">📈 รายงาน</button>
+      <div style="flex:1"></div>
+      <button class="sidebar-item" style="background:var(--danger);color:#fff;margin-top:8px" onclick="app.logout()">🚪 ออก</button>
+    </div>
+
+    <div class="main">
+      <div class="content">
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="section active">
+          <div class="header"><h2>📊 Dashboard</h2></div>
+          <div id="alerts"></div>
+          <div class="grid">
+            <div class="card">
+              <div class="stat-label">ยอดขายรวม</div>
+              <div class="stat-value green" id="stat-total-sales">0 ฿</div>
+            </div>
+            <div class="card">
+              <div class="stat-label">เงินสดวันนี้</div>
+              <div class="stat-value blue" id="stat-cash-today">0 ฿</div>
+            </div>
+            <div class="card">
+              <div class="stat-label">เงินโอนวันนี้</div>
+              <div class="stat-value" style="color:#d97706" id="stat-transfer-today">0 ฿</div>
+            </div>
+            <div class="card">
+              <div class="stat-label">เงินเชื่อวันนี้</div>
+              <div class="stat-value" style="color:#f59e0b" id="stat-credit-today">0 ฿</div>
+            </div>
+            <div class="card">
+              <div class="stat-label">กำไร</div>
+              <div class="stat-value green" id="stat-profit">0 ฿</div>
+            </div>
+            <div class="card">
+              <div class="stat-label">ขาดทุน</div>
+              <div class="stat-value red" id="stat-loss">0 ฿</div>
+            </div>
+            <div class="card">
+              <div class="stat-label">ยอดค้างชำระ</div>
+              <div class="stat-value red" id="stat-receivable">0 ฿</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div id="settings" class="section">
+          <div class="header"><h2>⚙️ ตั้งค่าระบบ</h2></div>
+          <div style="max-width:600px">
+            <div class="card" style="margin-bottom:20px">
+              <h3 style="font-size:14px;font-weight:800;margin-bottom:12px">🏪 ข้อมูลร้าน</h3>
+              <div class="form-field">
+                <label>ชื่อร้าน <span class="required">*</span></label>
+                <input id="setting-shop-name" type="text" placeholder="ชื่อร้าน/บริษัท">
+              </div>
+              <div class="form-field">
+                <label>เบอร์โทร <span class="required">*</span></label>
+                <input id="setting-shop-phone" type="tel" placeholder="เช่น 0812345678">
+              </div>
+              <div class="form-field">
+                <label>เลขประจำตัวผู้เสียภาษี <span class="required">*</span></label>
+                <input id="setting-shop-tax" type="text" placeholder="เช่น 1234567890123">
+              </div>
+              <div class="form-field">
+                <label>ที่อยู่</label>
+                <textarea id="setting-shop-address" placeholder="ที่อยู่ร้าน" style="height:60px;margin-top:4px;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--rs);outline:none;font-family:inherit"></textarea>
+              </div>
+              <div class="form-field">
+                <label>อัตราภาษี (%)</label>
+                <input id="setting-shop-taxrate" type="number" placeholder="0" min="0" max="100" step="0.01" value="7">
+              </div>
+            </div>
+
+            <div class="card" style="margin-top:20px">
+              <h3 style="font-size:14px;font-weight:800;margin-bottom:12px">🔐 เปลี่ยนรหัส</h3>
+              <div class="form-field">
+                <label>รหัสใหม่</label>
+                <input id="setting-new-pass" type="password" placeholder="กรอกรหัสใหม่">
+              </div>
+              <div class="form-field">
+                <label>ยืนยันรหัสใหม่</label>
+                <input id="setting-confirm-pass" type="password" placeholder="กรอกรหัสใหม่อีกครั้ง">
+              </div>
+            </div>
+
+            <div style="display:flex;gap:8px;justify-content:center;padding:16px;background:var(--primary-l);border-radius:var(--rs);margin-top:20px">
+              <button class="btn btn-primary" style="font-size:14px;padding:12px 24px" onclick="app.saveSettings()">✓ บันทึกการตั้งค่า</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- USERS -->
+        <div id="users" class="section">
+          <div class="header">
+            <h2>🔑 จัดการผู้ใช้</h2>
+            <button class="btn btn-accent" onclick="app.openAddUser()">+ เพิ่ม</button>
+          </div>
+          <table>
+            <thead><tr><th>ชื่อ</th><th>รหัสสิทธิ์</th><th>จัดการ</th></tr></thead>
+            <tbody id="users-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- CUSTOMERS -->
+        <div id="customers" class="section">
+          <div class="header">
+            <h2>👥 จัดการลูกค้า</h2>
+            <button class="btn btn-accent" onclick="app.openAddCustomer()">+ เพิ่ม</button>
+          </div>
+          <div class="search-box"><input id="search-cust" type="text" placeholder="ค้นหา..." onkeyup="app.renderCustomers()"></div>
+          <table>
+            <thead><tr><th>ชื่อ</th><th>โทร</th><th>อีเมล</th><th>ยอดซื้อ</th><th>จัดการ</th></tr></thead>
+            <tbody id="customers-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- PRODUCTS -->
+        <div id="products" class="section">
+          <div class="header">
+            <h2>📦 จัดการสินค้า</h2>
+            <button class="btn btn-accent" onclick="app.openAddProduct()">+ เพิ่มสินค้า</button>
+            <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์</button>
+          </div>
+          <div class="search-box">
+            <input id="search-products" type="text" placeholder="🔍 ค้นหาสินค้า" onchange="app.renderProducts()" oninput="app.renderProducts()">
+          </div>
+          <table>
+            <thead><tr><th>รหัส</th><th>ชื่อ</th><th>ราคาทุน</th><th>ราคาขาย</th><th>สต็อก</th><th>จัดการ</th></tr></thead>
+            <tbody id="products-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- STOCK -->
+        <div id="stock" class="section">
+          <div class="header">
+            <h2>📥 จัดการสต็อก</h2>
+            <button class="btn btn-accent" onclick="app.openAddStock()">+ เพิ่มสต็อก</button>
+            <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์</button>
+          </div>
+          <table>
+            <thead><tr><th>รหัส</th><th>สินค้า</th><th>จำนวน</th><th>ราคาทุน</th><th>จัดการ</th></tr></thead>
+            <tbody id="stock-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- SALES -->
+        <div id="sales" class="section">
+          <div class="header"><h2>🛒 ขาย</h2></div>
+          <div class="search-box">
+            <input id="search-prod" type="text" placeholder="ค้นหาสินค้า..." onkeyup="app.filterProducts()">
+          </div>
+          <div id="cat-bar" style="display:flex;gap:5px;overflow-x:auto;margin-bottom:8px;scrollbar-width:none"></div>
+          <div style="display:grid;grid-template-columns:1fr 280px;gap:12px;height:calc(100% - 80px)">
+            <div style="overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:12px;background:var(--bg);border-radius:var(--r)">
+              <div id="product-grid"></div>
+            </div>
+            <div style="background:var(--surface);border-radius:var(--r);box-shadow:var(--sh);display:flex;flex-direction:column;overflow:hidden">
+              <div style="padding:10px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;font-weight:800">🛍️ ตะกร้า</span>
+                <button style="font-size:10px;color:var(--danger);cursor:pointer;background:none;border:none;padding:3px 6px;border-radius:var(--rs)" onclick="app.clearCart()">×</button>
+              </div>
+              <div id="cart-items" style="flex:1;overflow-y:auto;padding:6px 10px"><div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:12px">ตะกร้าว่าง</div></div>
+              <div style="border-top:1px solid var(--border);padding:8px 10px;display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>รวม:</span><span id="cart-subtotal">0 ฿</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:900;color:var(--text);border-top:1px solid var(--border);padding-top:6px"><span>ยอด:</span><span id="cart-total">0 ฿</span></div>
+                <button style="background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:10px;font-size:12px;font-weight:800;cursor:pointer;width:100%;font-family:inherit" onclick="app.openCheckout()">💳 ชำระ</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONSIGNMENT -->
+        <div id="consignment" class="section">
+          <div style="display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:12px">
+            <button class="btn btn-primary" id="cons-tab-shops" onclick="app.switchConsignmentTab('shops')" style="flex:1">1. ร้านฝากขาย</button>
+            <button class="btn" id="cons-tab-products" onclick="app.switchConsignmentTab('products')" style="flex:1">2. สินค้าฝาก</button>
+            <button class="btn" id="cons-tab-track" onclick="app.switchConsignmentTab('track')" style="flex:1">3. ติดตาม</button>
+            <button class="btn" id="cons-tab-summary" onclick="app.switchConsignmentTab('summary')" style="flex:1">4. สรุป</button>
+            <button class="btn" id="cons-tab-received" onclick="app.switchConsignmentTab('received')" style="flex:1">5. รับเงิน</button>
+            <button class="btn" id="cons-tab-returned" onclick="app.switchConsignmentTab('returned')" style="flex:1">6. คืนสินค้า</button>
+          </div>
+
+          <!-- Shops -->
+          <div id="cons-shops" class="section active">
+            <div class="header">
+              <h2>ร้านที่รับฝากขาย</h2>
+              <button class="btn btn-accent" onclick="app.openAddConsignmentShop()">+ เพิ่มร้าน</button>
+            </div>
+            <table>
+              <thead><tr><th>ชื่อร้าน</th><th>ผู้ติดต่อ</th><th>เบอร์โทร</th><th>ค่าคอม %</th><th>จัดการ</th></tr></thead>
+              <tbody id="cons-shops-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- Products -->
+          <div id="cons-products" class="section">
+            <div class="header">
+              <h2>สินค้าที่นำไปฝาก</h2>
+              <button class="btn btn-accent" onclick="app.openAddConsignmentProduct()">+ เพิ่มสินค้าฝาก</button>
+            </div>
+            <table>
+              <thead><tr><th>รหัส</th><th>ชื่อ</th><th>จำนวน</th><th>ราคา</th><th>ร้าน</th><th>วันที่</th><th>จัดการ</th></tr></thead>
+              <tbody id="cons-products-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- Tracking -->
+          <div id="cons-track" class="section">
+            <div class="header"><h2>ติดตามสินค้า</h2></div>
+            <table>
+              <thead><tr><th>สินค้า</th><th>ร้าน</th><th>ฝากไป</th><th>ขายแล้ว</th><th>เหลือ</th><th>คืนมา</th></tr></thead>
+              <tbody id="cons-track-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- Summary -->
+          <div id="cons-summary" class="section">
+            <div class="header"><h2>สรุปยอดขายจากร้าน</h2></div>
+            <div id="cons-summary-list"></div>
+          </div>
+
+          <!-- Received -->
+          <div id="cons-received" class="section">
+            <div class="header">
+              <h2>รับเงินจากร้าน</h2>
+              <button class="btn btn-accent" onclick="app.openAddConsignmentReceived()">+ บันทึกรับเงิน</button>
+            </div>
+            <table>
+              <thead><tr><th>ร้าน</th><th>วันที่</th><th>ยอดขาย</th><th>ค่าคอม</th><th>สุทธิ</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+              <tbody id="cons-received-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- Returned -->
+          <div id="cons-returned" class="section">
+            <div class="header">
+              <h2>รับสินค้าคืน</h2>
+              <button class="btn btn-accent" onclick="app.openAddConsignmentReturned()">+ บันทึกคืนสินค้า</button>
+            </div>
+            <table>
+              <thead><tr><th>สินค้า</th><th>ร้าน</th><th>จำนวน</th><th>วันที่</th><th>สภาพ</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+              <tbody id="cons-returned-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- BILLS -->
+        <div id="bills" class="section">
+          <div class="header">
+            <h2>📜 บิล</h2>
+            <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+            <div class="form-field">
+              <label>จากวันที่</label>
+              <input id="filter-date-from" type="date" onchange="app.renderBills()">
+            </div>
+            <div class="form-field">
+              <label>ถึงวันที่</label>
+              <input id="filter-date-to" type="date" onchange="app.renderBills()">
+            </div>
+            <div class="form-field">
+              <label>ช่วงเวลา</label>
+              <select id="filter-period" onchange="app.setPeriod(this.value)">
+                <option value="custom">กำหนดเอง</option>
+                <option value="today">วันนี้</option>
+                <option value="week">7 วันที่แล้ว</option>
+                <option value="month">1 เดือนที่แล้ว</option>
+                <option value="all">ทั้งหมด</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>สถานะ</label>
+              <select id="filter-status" onchange="app.renderBills()">
+                <option value="">ทั้งหมด</option>
+                <option value="paid">🟢 จ่ายแล้ว</option>
+                <option value="credit">🟡 เครดิต</option>
+                <option value="canceled">🔴 ยกเลิก</option>
+              </select>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>เลขที่บิล</th><th>วันที่</th><th>ยอดรวม</th><th>วิธีชำระ</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+            <tbody id="bills-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- REPORTS -->
+        <div id="reports" class="section">
+          <div class="header">
+            <h2>📈 รายงาน</h2>
+            <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์</button>
+          </div>
+
+          <div style="margin-bottom:20px">
+            <h3 style="font-size:14px;font-weight:800;margin-bottom:12px">📊 สรุปยอดขาย</h3>
+            <table>
+              <thead><tr><th>วันที่</th><th>ยอดขาย</th><th>เงินสด</th><th>โอน</th><th>เครดิต</th><th>ยอดค้าง</th></tr></thead>
+              <tbody id="sales-summary-tbody"></tbody>
+            </table>
+          </div>
+
+          <div style="margin-bottom:20px">
+            <h3 style="font-size:14px;font-weight:800;margin-bottom:12px">💰 ลูกหนี้</h3>
+            <table>
+              <thead><tr><th>ลูกค้า</th><th>ยอดค้าง</th><th>วันที่บิล</th></tr></thead>
+              <tbody id="receivable-tbody"></tbody>
+            </table>
+          </div>
+
+          <div style="margin-bottom:20px">
+            <h3 style="font-size:14px;font-weight:800;margin-bottom:12px">👥 สรุปลูกค้า</h3>
+            <table>
+              <thead><tr><th>ชื่อลูกค้า</th><th>ยอดซื้อทั้งหมด</th><th>จำนวนครั้ง</th></tr></thead>
+              <tbody id="customer-summary-tbody"></tbody>
+            </table>
+          </div>
+
+          <div>
+            <h3 style="font-size:14px;font-weight:800;margin-bottom:12px">📊 สรุปสต็อก</h3>
+            <table>
+              <thead><tr><th>รหัส</th><th>สินค้า</th><th>สต็อก</th><th>ราคาทุน</th><th>มูลค่ารวม</th></tr></thead>
+              <tbody id="stock-summary-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-ov" id="checkout-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title">💳 ชำระเงิน</div><button class="modal-close" onclick="app.closeModal()">&times;</button></div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label>ลูกค้า (ถ้ามี)</label>
+        <select id="checkout-customer"></select>
+      </div>
+      <div class="card">
+        <div class="stat-label">ยอดรวม</div>
+        <div class="stat-value blue" id="checkout-subtotal">0 ฿</div>
+      </div>
+      <div class="form-field">
+        <label>วิธีชำระ</label>
+        <select id="payment-method" onchange="app.updatePaymentUI()">
+          <option value="cash">💵 เงินสด</option>
+          <option value="transfer">🏦 โอน</option>
+          <option value="credit">🟡 เครดิต</option>
+        </select>
+      </div>
+      <div class="form-field" id="discount-field">
+        <label>ส่วนลด (฿)</label>
+        <input id="discount-amount" type="number" placeholder="0" min="0" onchange="app.calcTotal()">
+      </div>
+      <div class="form-field" id="received-field">
+        <label>จำนวนที่ได้รับ</label>
+        <input id="received-amount" type="number" placeholder="0" onchange="app.calcChange()">
+      </div>
+      <div id="change-display" style="display:none;padding:10px;background:var(--accent-l);border-radius:var(--rs);color:var(--accent);font-weight:700">ทอน: <span id="change-amount">0</span> ฿</div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn-cancel" onclick="app.closeModal()">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="app.completeCheckout()">✓ ยืนยัน</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-ov" id="receipt-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title">🧾 รายละเอียดบิล</div><button class="modal-close" onclick="app.closeModal()">&times;</button></div>
+    <div class="modal-body" id="receipt-body"></div>
+    <div class="modal-ftr">
+      <button class="btn btn-primary" id="receipt-print-btn">🖨️ พิมพ์</button>
+      <button class="btn-cancel" onclick="app.closeModal()">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-ov" id="form-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title" id="form-title">ฟอร์ม</div><button class="modal-close" onclick="app.closeModal()">&times;</button></div>
+    <div class="modal-body" id="form-body"></div>
+    <div class="modal-ftr">
+      <button class="btn-cancel" onclick="app.closeModal()">ยกเลิก</button>
+      <button class="btn btn-primary" id="form-save-btn" onclick="app.saveForm()">✓ บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
