@@ -95,11 +95,75 @@ tr:hover td{background:var(--bg)}
 .form-field label .required{color:var(--danger)}
 .form-field input,.form-field select,.form-field textarea{border:1px solid var(--border2);border-radius:var(--rs);padding:8px 10px;font-size:12px;outline:none;font-family:inherit;width:100%}
 .form-field input:focus,.form-field select:focus{border-color:var(--primary)}
-
 @media print {
   nav, .sidebar, .header button, .search-box, .modal-ov, body {
     display: none !important;
   }
   .content { display: block !important; }
   table { page-break-inside: avoid; }
+  @media print {
+  body {
+    display: block !important;
+    background: #fff !important;
+    color: #000 !important;
+    height: auto !important;
+  }
+
+  nav,
+  .sidebar,
+  .header,
+  button,
+  .search-box {
+    display: none !important;
+  }
+
+  .content {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .section {
+    display: none !important;
+  }
+
+  .section.active {
+    display: block !important;
+  }
+
+  table {
+    width: 100% !important;
+    page-break-inside: avoid;
+    color: #000 !important;
+    background: #fff !important;
+  }
+
+  th,
+  td {
+    color: #000 !important;
+    background: #fff !important;
+  }
+
+  .modal-ov {
+    display: none !important;
+  }
+
+  .modal-ov.open {
+    display: flex !important;
+    position: static !important;
+    background: none !important;
+  }
+
+  .modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+  }
+
+  .modal-close,
+  .modal-ftr {
+    display: none !important;
+  }
+}
 }
