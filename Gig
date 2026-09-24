@@ -1,0 +1,77 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+.env.local
+.env.*.local
+
+# Build and dist files
+dist/
+build/
+*.min.js
+*.min.css
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup files
+*.bak
+*.backup
+*.tmp
+*~
+.swp
+.swo
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Local development
+.cache/
+.eslintcache
+coverage/
+
+# Deployment files
+.netlify/
+.vercel/
+
+# Database backups (if any)
+*.db
+*.sqlite
+
+# Temporary files
+temp/
+tmp/
+*.temp
+*.tmp
+
+# System files
+.AppleDouble
+.LSOverride
+*.cab
+*.msi
