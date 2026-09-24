@@ -167,3 +167,28 @@ tr:hover td{background:var(--bg)}
   }
 }
 }
+/* ปุ่มออกจากระบบ */
+.btn-logout {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  background: #dc2626 !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-logout:hover {
+  background: #b91c1c !important;
+}
+
+/* ปุ่มออกจากระบบในเมนูด้านข้าง */
+.sidebar-item[onclick="app.logout()"] {
+  display: flex !important;
+  background: #dc2626 !important;
+  color: #fff !important;
+}
